@@ -1,0 +1,2037 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Худалдаа — Монгол зах зээл</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mongolian&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #C0392B;
+    --red-dark: #922B21;
+    --red-light: #FADBD8;
+    --gold: #F39C12;
+    --gold-light: #FEF9E7;
+    --bg: #F5F4F0;
+    --surface: #FFFFFF;
+    --border: #E8E5DF;
+    --text: #1A1A1A;
+    --muted: #7A7570;
+    --green: #1E8449;
+    --green-light: #D5F5E3;
+    --blue: #1A5276;
+    --blue-light: #D6EAF8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* TOP NAV */
+  .nav {
+    background: var(--red);
+    padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+    height: 56px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .nav-logo { color: white; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; flex-shrink: 0; }
+  .nav-logo span { color: var(--gold); }
+  .nav-search {
+    flex: 1; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 8px; padding: 8px 14px; color: white; font-size: 14px; outline: none;
+    font-family: 'Inter', sans-serif;
+  }
+  .nav-search::placeholder { color: rgba(255,255,255,0.65); }
+  .nav-search:focus { background: rgba(255,255,255,0.25); }
+  .nav-btn {
+    background: var(--gold); border: none; color: #fff; padding: 8px 16px;
+    border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .nav-btn:hover { background: #D68910; }
+  .nav-icon {
+    width: 36px; height: 36px; background: rgba(255,255,255,0.15);
+    border: none; border-radius: 8px; cursor: pointer; color: white;
+    font-size: 18px; display: flex; align-items: center; justify-content: center;
+    position: relative; flex-shrink: 0;
+  }
+  .badge {
+    position: absolute; top: -4px; right: -4px; background: var(--gold);
+    color: white; font-size: 10px; font-weight: 700; border-radius: 10px;
+    padding: 1px 5px; min-width: 16px; text-align: center;
+  }
+
+  /* CATEGORY BAR */
+  .cats {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem; display: flex; gap: 4px; overflow-x: auto;
+  }
+  .cats::-webkit-scrollbar { display: none; }
+  .cat-btn {
+    padding: 10px 16px; font-size: 13px; font-weight: 500; cursor: pointer;
+    border: none; background: none; color: var(--muted); white-space: nowrap;
+    border-bottom: 2px solid transparent;
+  }
+  .cat-btn.active { color: var(--red); border-bottom-color: var(--red); }
+  .cat-btn:hover:not(.active) { color: var(--text); }
+
+  /* LAYOUT */
+  .layout { display: flex; max-width: 1200px; margin: 0 auto; gap: 0; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px; flex-shrink: 0; padding: 1.5rem 1rem;
+    display: none;
+  }
+  @media(min-width: 900px) { .sidebar { display: block; } }
+  .filter-section { margin-bottom: 1.5rem; }
+  .filter-title { font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--muted); margin-bottom: 10px; }
+  .filter-option {
+    display: flex; align-items: center; gap: 8px; padding: 6px 0;
+    cursor: pointer; font-size: 13px; color: var(--text);
+  }
+  .filter-option input { accent-color: var(--red); }
+  .price-range { display: flex; gap: 6px; }
+  .price-input {
+    flex: 1; border: 1px solid var(--border); border-radius: 6px;
+    padding: 6px 8px; font-size: 12px; outline: none; color: var(--text);
+    font-family: 'Inter', sans-serif; background: var(--surface);
+  }
+  .price-input:focus { border-color: var(--red); }
+  .apply-btn {
+    width: 100%; background: var(--red); color: white; border: none;
+    border-radius: 8px; padding: 9px; font-size: 13px; font-weight: 600;
+    cursor: pointer; margin-top: 12px;
+  }
+  .apply-btn:hover { background: var(--red-dark); }
+
+  /* MAIN */
+  .main { flex: 1; padding: 1.5rem; min-width: 0; }
+  .main-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.25rem;
+  }
+  .main-title { font-size: 15px; font-weight: 600; }
+  .sort-select {
+    border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px;
+    font-size: 13px; outline: none; cursor: pointer;
+    color: var(--text); background: var(--surface);
+    font-family: 'Inter', sans-serif;
+  }
+  .sort-select:focus { border-color: var(--red); }
+
+  /* PRODUCT GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+  }
+  .card {
+    background: var(--surface); border-radius: 12px; border: 1px solid var(--border);
+    cursor: pointer; overflow: hidden; transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .card-img {
+    width: 100%; aspect-ratio: 1; object-fit: cover;
+    background: linear-gradient(135deg, #f0ede8, #e8e3da);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 48px; position: relative;
+  }
+  .card-like {
+    position: absolute; top: 8px; right: 8px;
+    background: rgba(255,255,255,0.85); border-radius: 50%;
+    width: 30px; height: 30px; display: flex; align-items: center;
+    justify-content: center; font-size: 14px; cursor: pointer;
+    border: none; backdrop-filter: blur(4px);
+  }
+  .card-like.liked { background: var(--red-light); }
+  .card-body { padding: 10px 12px 12px; }
+  .card-title { font-size: 13px; font-weight: 500; line-height: 1.4; margin-bottom: 4px; }
+  .card-price { font-size: 15px; font-weight: 700; color: var(--red); }
+  .card-price span { font-size: 11px; font-weight: 400; color: var(--muted); margin-left: 2px; }
+  .card-meta { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
+  .card-loc { font-size: 11px; color: var(--muted); }
+  .card-cond {
+    font-size: 10px; font-weight: 600; padding: 2px 7px;
+    border-radius: 4px; background: var(--green-light); color: var(--green);
+  }
+  .card-cond.used { background: var(--gold-light); color: #875A12; }
+
+  /* BOTTOM TABS */
+  .bottom-tabs {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; z-index: 100;
+  }
+  @media(min-width: 900px) { .bottom-tabs { display: none; } }
+  .tab {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 8px 4px 12px; cursor: pointer; border: none; background: none;
+    font-size: 10px; color: var(--muted); gap: 3px;
+  }
+  .tab.active { color: var(--red); }
+  .tab-icon { font-size: 22px; }
+
+  /* MODAL OVERLAY */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    align-items: flex-end; justify-content: center;
+  }
+  .overlay.show { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 600px; max-height: 90vh;
+    overflow-y: auto; padding: 1.5rem;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-handle {
+    width: 36px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 0 auto 1.25rem;
+  }
+  .modal-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+  .modal-close {
+    margin-left: auto; background: none; border: none;
+    font-size: 22px; cursor: pointer; color: var(--muted);
+  }
+  .modal-close:hover { color: var(--text); }
+  .modal-img {
+    width: 100%; aspect-ratio: 4/3; border-radius: 12px;
+    background: linear-gradient(135deg, #f0ede8, #e8e3da);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 80px; margin-bottom: 1.25rem; overflow: hidden;
+  }
+  .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .modal-price { font-size: 24px; font-weight: 700; color: var(--red); margin-bottom: 12px; }
+  .modal-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 1.25rem; }
+  .seller-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; background: var(--bg);
+    border-radius: 10px; margin-bottom: 1.25rem;
+  }
+  .seller-avatar {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--red); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px; flex-shrink: 0;
+  }
+  .seller-name { font-size: 14px; font-weight: 600; }
+  .seller-stars { font-size: 12px; color: var(--gold); }
+  .seller-count { font-size: 12px; color: var(--muted); }
+  .modal-actions { display: flex; gap: 10px; }
+  .btn-primary {
+    flex: 1; background: var(--red); color: white; border: none;
+    border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: 'Inter', sans-serif;
+  }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-secondary {
+    background: var(--bg); color: var(--text); border: 1px solid var(--border);
+    border-radius: 10px; padding: 14px 18px; font-size: 15px; cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-secondary:hover { background: var(--border); }
+
+  /* CHAT PANEL */
+  .chat-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 300;
+    align-items: flex-end; justify-content: center;
+  }
+  .chat-overlay.show { display: flex; }
+  .chat-panel {
+    background: var(--surface); border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 520px; height: 80vh;
+    display: flex; flex-direction: column;
+    animation: slideUp 0.25s ease;
+  }
+  .chat-header {
+    padding: 1rem 1.25rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+  }
+  .chat-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--red); color: white; display: flex;
+    align-items: center; justify-content: center; font-weight: 700; font-size: 14px;
+  }
+  .chat-name { font-size: 14px; font-weight: 600; }
+  .chat-status { font-size: 12px; color: var(--green); }
+  .chat-close { margin-left: auto; background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 10px; }
+  .msg { max-width: 75%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; }
+  .msg.them { background: var(--bg); color: var(--text); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg.me { background: var(--red); color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg-time { font-size: 11px; opacity: 0.6; margin-top: 4px; }
+  .chat-input-row {
+    padding: 12px 1.25rem 1.5rem; border-top: 1px solid var(--border);
+    display: flex; gap: 10px; align-items: center;
+  }
+  .chat-input {
+    flex: 1; border: 1px solid var(--border); border-radius: 20px;
+    padding: 10px 16px; font-size: 14px; outline: none;
+    font-family: 'Inter', sans-serif; background: var(--bg);
+    color: var(--text);
+  }
+  .chat-input:focus { border-color: var(--red); background: var(--surface); }
+  .send-btn {
+    width: 40px; height: 40px; background: var(--red); border: none;
+    border-radius: 50%; color: white; font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--red-dark); }
+
+  /* LIST MODAL */
+  .list-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 400;
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .list-overlay.show { display: flex; }
+  .list-modal {
+    background: var(--surface); border-radius: 16px;
+    width: 100%; max-width: 480px; max-height: 90vh;
+    overflow-y: auto; padding: 1.5rem;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+  .list-title { font-size: 18px; font-weight: 700; margin-bottom: 1.5rem; }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-label { font-size: 13px; font-weight: 600; color: var(--text); display: block; margin-bottom: 6px; }
+  .form-input, .form-select, .form-textarea {
+    width: 100%; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; font-size: 14px; outline: none;
+    font-family: 'Inter', sans-serif; color: var(--text);
+    background: var(--bg);
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--red); background: var(--surface);
+  }
+  .form-textarea { resize: vertical; min-height: 90px; }
+  .img-upload {
+    width: 100%; aspect-ratio: 16/7; border: 2px dashed var(--border);
+    border-radius: 12px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+    cursor: pointer; color: var(--muted); font-size: 13px;
+    transition: border-color 0.15s;
+  }
+  .img-upload:hover { border-color: var(--red); color: var(--red); }
+  .img-upload-icon { font-size: 36px; }
+  .form-row { display: flex; gap: 12px; }
+  .form-row .form-group { flex: 1; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: #1A1A1A; color: white; padding: 12px 20px;
+    border-radius: 24px; font-size: 14px; font-weight: 500;
+    z-index: 500; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show { opacity: 1; }
+
+  /* PAYMENT MODAL */
+  .pay-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 450;
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .pay-overlay.show { display: flex; }
+  .pay-modal {
+    background: var(--surface); border-radius: 16px;
+    width: 100%; max-width: 400px; padding: 1.5rem;
+    animation: fadeIn 0.2s ease;
+  }
+  .pay-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .pay-subtitle { font-size: 13px; color: var(--muted); margin-bottom: 1.5rem; }
+  .pay-amount {
+    background: var(--bg); border-radius: 12px;
+    padding: 16px; text-align: center; margin-bottom: 1.5rem;
+  }
+  .pay-amount-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .pay-amount-value { font-size: 28px; font-weight: 700; color: var(--red); }
+  .pay-methods { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.5rem; }
+  .pay-method {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; border: 1.5px solid var(--border);
+    border-radius: 10px; cursor: pointer; font-size: 14px;
+    transition: border-color 0.15s;
+  }
+  .pay-method.selected { border-color: var(--red); background: var(--red-light); }
+  .pay-method-icon { font-size: 22px; }
+  .pay-method-name { font-weight: 500; }
+  .pay-method-desc { font-size: 12px; color: var(--muted); }
+  .pay-actions { display: flex; gap: 10px; }
+
+  /* DELIVERY SECTION */
+  .delivery-info {
+    background: var(--blue-light); border-radius: 10px;
+    padding: 12px; margin-bottom: 1.25rem;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .delivery-icon { font-size: 22px; flex-shrink: 0; }
+  .delivery-title { font-size: 13px; font-weight: 600; color: var(--blue); margin-bottom: 2px; }
+  .delivery-text { font-size: 12px; color: var(--blue); }
+
+  /* NOTIFICATIONS */
+  .notif-popup {
+    position: fixed; top: 70px; right: 16px; z-index: 700;
+    display: flex; flex-direction: column; gap: 10px;
+    pointer-events: none; max-width: 320px; width: calc(100% - 32px);
+  }
+  .notif-item {
+    background: var(--surface); border-radius: 14px;
+    border: 1px solid var(--border); padding: 12px 14px;
+    display: flex; gap: 12px; align-items: flex-start;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    pointer-events: all; cursor: pointer;
+    animation: notifSlideIn 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    transform-origin: top right;
+  }
+  @keyframes notifSlideIn {
+    from { opacity:0; transform: scale(0.85) translateY(-10px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
+  }
+  .notif-item.exit {
+    animation: notifSlideOut 0.3s ease forwards;
+  }
+  @keyframes notifSlideOut {
+    to { opacity:0; transform: scale(0.9) translateX(20px); }
+  }
+  .notif-emoji { font-size: 28px; flex-shrink: 0; }
+  .notif-body { flex: 1; min-width: 0; }
+  .notif-label { font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--red); margin-bottom: 2px; }
+  .notif-title { font-size: 13px; font-weight: 600; line-height: 1.3; margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .notif-meta { font-size: 11px; color: var(--muted); }
+  .notif-price { font-size: 13px; font-weight: 700; color: var(--red);
+    white-space: nowrap; flex-shrink: 0; }
+  .notif-close { background: none; border: none; color: var(--muted);
+    font-size: 16px; cursor: pointer; flex-shrink: 0; padding: 0 0 0 4px; }
+  .notif-progress {
+    height: 3px; background: var(--red); border-radius: 2px;
+    margin-top: 8px; animation: notifBar 5s linear forwards;
+  }
+  @keyframes notifBar { from { width:100%; } to { width:0%; } }
+
+  /* NOTIFICATION CENTER */
+  .notif-center {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 650;
+    align-items: flex-start; justify-content: flex-end;
+    padding: 64px 12px 0;
+  }
+  .notif-center.show { display: flex; }
+  .notif-panel {
+    background: var(--surface); border-radius: 16px;
+    width: 100%; max-width: 360px; max-height: 80vh;
+    overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    animation: fadeIn 0.2s ease;
+  }
+  .notif-panel-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0;
+    background: var(--surface); z-index: 1;
+  }
+  .notif-panel-title { font-size: 15px; font-weight: 700; }
+  .notif-panel-clear { font-size: 12px; color: var(--red); cursor: pointer;
+    background: none; border: none; font-family: 'Inter',sans-serif; font-weight: 600; }
+  .notif-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 12px 16px; border-bottom: 1px solid var(--border);
+    cursor: pointer; transition: background 0.1s;
+  }
+  .notif-row:hover { background: var(--bg); }
+  .notif-row.unread { background: #FEF9F9; }
+  .notif-row-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--red);
+    flex-shrink: 0; margin-top: 5px;
+  }
+  .notif-row-dot.read { background: transparent; }
+  .notif-row-emoji { font-size: 24px; flex-shrink: 0; }
+  .notif-row-body { flex: 1; min-width: 0; }
+  .notif-row-title { font-size: 13px; font-weight: 500; line-height: 1.4;
+    margin-bottom: 2px; }
+  .notif-row-time { font-size: 11px; color: var(--muted); }
+  .notif-row-price { font-size: 13px; font-weight: 700; color: var(--red);
+    white-space: nowrap; }
+  .notif-empty { text-align: center; padding: 3rem 1rem;
+    color: var(--muted); font-size: 14px; }
+  .notif-sub { font-size: 11px; color: var(--muted); padding: 6px 16px 10px;
+    border-bottom: 1px solid var(--border); }
+  .rating-stars { display: flex; gap: 4px; margin: 1rem 0; justify-content: center; }
+  .star-btn { font-size: 32px; cursor: pointer; background: none; border: none; transition: transform 0.1s; }
+  .star-btn:hover, .star-btn.lit { transform: scale(1.15); }
+
+  /* SWAP */
+  --swap: #6C3FC5;
+  --swap-light: #EDE8FA;
+  .btn-swap {
+    flex: 1; background: #6C3FC5; color: white; border: none;
+    border-radius: 10px; padding: 14px; font-size: 15px; font-weight: 600;
+    cursor: pointer; font-family: 'Inter', sans-serif;
+  }
+  .btn-swap:hover { background: #5a33a8; }
+  .swap-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 500;
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .swap-overlay.show { display: flex; }
+  .swap-modal {
+    background: var(--surface); border-radius: 18px;
+    width: 100%; max-width: 500px; max-height: 88vh;
+    overflow-y: auto; padding: 1.5rem;
+    animation: fadeIn 0.2s ease;
+  }
+  .swap-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .swap-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.25rem; }
+  .swap-target {
+    display: flex; gap: 12px; align-items: center;
+    background: #EDE8FA; border-radius: 12px; padding: 12px 14px;
+    margin-bottom: 1.25rem;
+  }
+  .swap-target-emoji { font-size: 32px; }
+  .swap-target-title { font-size: 14px; font-weight: 600; color: #3d1f80; }
+  .swap-target-seller { font-size: 12px; color: #6C3FC5; }
+  .swap-arrow {
+    text-align: center; font-size: 26px; margin: 0 0 1rem;
+    color: #6C3FC5; font-weight: 700;
+  }
+  .swap-section-title {
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    margin-bottom: 10px;
+  }
+  .my-items-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px; margin-bottom: 1.25rem;
+  }
+  .my-item {
+    border: 2px solid var(--border); border-radius: 12px; overflow: hidden;
+    cursor: pointer; transition: border-color 0.15s, transform 0.1s;
+  }
+  .my-item:hover { border-color: #6C3FC5; transform: scale(1.02); }
+  .my-item.selected { border-color: #6C3FC5; background: #EDE8FA; }
+  .my-item-img {
+    aspect-ratio: 1; background: linear-gradient(135deg, #f0ede8, #e8e3da);
+    display: flex; align-items: center; justify-content: center; font-size: 32px;
+  }
+  .my-item-body { padding: 7px 8px; }
+  .my-item-title { font-size: 11px; font-weight: 500; line-height: 1.3; }
+  .my-item-price { font-size: 11px; color: #6C3FC5; font-weight: 600; margin-top: 2px; }
+  .my-item-check {
+    display: none; position: absolute; top: 5px; right: 5px;
+    background: #6C3FC5; color: white; border-radius: 50%;
+    width: 20px; height: 20px; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+  }
+  .my-item.selected .my-item-check { display: flex; }
+  .my-item { position: relative; }
+  .swap-note-label { font-size: 13px; font-weight: 600; margin-bottom: 6px; display: block; }
+  .swap-note {
+    width: 100%; border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; font-size: 13px; outline: none; resize: vertical;
+    min-height: 70px; font-family: 'Inter', sans-serif;
+    background: var(--bg); color: var(--text); margin-bottom: 1.25rem;
+  }
+  .swap-note:focus { border-color: #6C3FC5; background: var(--surface); }
+  .swap-diff {
+    background: var(--bg); border-radius: 10px; padding: 12px;
+    margin-bottom: 1.25rem; display: flex; gap: 8px; align-items: center;
+  }
+  .swap-diff label { font-size: 13px; font-weight: 500; }
+  .swap-diff input {
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 6px 10px; font-size: 13px; outline: none; width: 130px;
+    font-family: 'Inter', sans-serif; background: var(--surface); color: var(--text);
+  }
+  .swap-diff input:focus { border-color: #6C3FC5; }
+  .swap-diff span { font-size: 12px; color: var(--muted); }
+
+  /* SWAP REQUESTS PANEL */
+  .req-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 600;
+    align-items: flex-end; justify-content: center;
+  }
+  .req-overlay.show { display: flex; }
+  .req-panel {
+    background: var(--surface); border-radius: 20px 20px 0 0;
+    width: 100%; max-width: 520px; max-height: 85vh;
+    overflow-y: auto; padding: 1.5rem;
+    animation: slideUp 0.25s ease;
+  }
+  .req-title { font-size: 18px; font-weight: 700; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+  .req-card {
+    border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px; margin-bottom: 12px;
+  }
+  .req-card.incoming { border-left: 4px solid #6C3FC5; }
+  .req-card.outgoing { border-left: 4px solid var(--gold); }
+  .req-card.accepted { border-left: 4px solid var(--green); }
+  .req-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .req-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #6C3FC5; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; flex-shrink: 0;
+  }
+  .req-avatar.out { background: var(--gold); }
+  .req-user { font-size: 13px; font-weight: 600; }
+  .req-time { font-size: 11px; color: var(--muted); margin-top: 1px; }
+  .req-badge {
+    margin-left: auto; font-size: 11px; font-weight: 600;
+    padding: 3px 9px; border-radius: 10px;
+  }
+  .req-badge.in { background: #EDE8FA; color: #6C3FC5; }
+  .req-badge.out { background: var(--gold-light); color: #875A12; }
+  .req-badge.ok { background: var(--green-light); color: var(--green); }
+  .req-items { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .req-item-box {
+    flex: 1; background: var(--bg); border-radius: 10px;
+    padding: 10px; display: flex; gap: 8px; align-items: center;
+  }
+  .req-item-emoji { font-size: 22px; }
+  .req-item-info { font-size: 12px; }
+  .req-item-name { font-weight: 500; line-height: 1.3; }
+  .req-item-val { color: var(--muted); margin-top: 2px; }
+  .req-swap-icon { font-size: 20px; color: var(--muted); flex-shrink: 0; }
+  .req-note { font-size: 12px; color: var(--muted); margin-bottom: 10px; font-style: italic; }
+  .req-actions { display: flex; gap: 8px; }
+  .req-btn {
+    flex: 1; padding: 9px; border-radius: 8px; font-size: 13px;
+    font-weight: 600; cursor: pointer; border: none; font-family: 'Inter', sans-serif;
+  }
+  .req-btn.accept { background: var(--green); color: white; }
+  .req-btn.accept:hover { background: #166038; }
+  .req-btn.decline { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+  .req-btn.decline:hover { background: var(--border); }
+  .req-btn.cancel { background: var(--bg); color: var(--muted); border: 1px solid var(--border); font-size: 12px; }
+  .notif-dot {
+    position: absolute; top: -4px; right: -4px; background: #6C3FC5;
+    width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--red);
+  }
+  .swap-tag {
+    position: absolute; top: 8px; left: 8px;
+    background: #6C3FC5; color: white; font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 4px;
+  }
+
+  /* BANNER */
+  .banner {
+    background: linear-gradient(135deg, var(--red-dark), var(--red));
+    margin: 1rem 1.5rem; border-radius: 14px; padding: 1.25rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    color: white;
+  }
+  .banner-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+  .banner-sub { font-size: 12px; opacity: 0.85; }
+  .banner-btn {
+    background: white; color: var(--red); border: none;
+    border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 700;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .banner-emoji { font-size: 40px; }
+
+  /* STATS ROW */
+  .stats-row {
+    display: flex; gap: 1px; background: var(--border);
+    margin: 0 1.5rem 1rem; border-radius: 12px; overflow: hidden;
+  }
+  .stat-box {
+    flex: 1; background: var(--surface); padding: 12px;
+    text-align: center;
+  }
+  .stat-num { font-size: 18px; font-weight: 700; color: var(--red); }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">Худалдаа<span>·мн</span></div>
+  <input class="nav-search" placeholder="🔍  Хайх... (гар утас, хувцас...)" id="searchInput">
+  <button class="nav-icon" onclick="showList()">＋</button>
+  <button class="nav-icon" onclick="toggleNotifCenter()">
+    🔔
+    <span class="badge" id="notifBadge" style="display:none">0</span>
+  </button>
+  <button class="nav-icon" onclick="showRequests()" id="reqBell" style="position:relative">
+    🔄
+    <span class="notif-dot" id="notifDot"></span>
+  </button>
+  <button class="nav-icon" onclick="showAdmin()" title="Админ">⚙️</button>
+  <button class="nav-icon">👤</button>
+</nav>
+
+<!-- CATEGORY BAR -->
+<div class="cats">
+  <button class="cat-btn active" onclick="filterCat(this,'all')">Бүгд</button>
+  <button class="cat-btn" onclick="filterCat(this,'electronics')">📱 Электроник</button>
+  <button class="cat-btn" onclick="filterCat(this,'clothes')">👗 Хувцас</button>
+  <button class="cat-btn" onclick="filterCat(this,'home')">🏠 Гэрийн эд</button>
+  <button class="cat-btn" onclick="filterCat(this,'car')">🚗 Машин</button>
+  <button class="cat-btn" onclick="filterCat(this,'sports')">⚽ Спорт</button>
+  <button class="cat-btn" onclick="filterCat(this,'books')">📚 Ном</button>
+  <button class="cat-btn" onclick="filterCat(this,'kids')">🧸 Хүүхдийн</button>
+</div>
+
+<!-- BANNER -->
+<div class="banner">
+  <div>
+    <div class="banner-title">🎉 Улаанбаатарын хамгийн том зах!</div>
+    <div class="banner-sub">Зарлах нь үнэгүй · Хурдан борлуул</div>
+  </div>
+  <span class="banner-emoji">🛍️</span>
+</div>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-box"><div class="stat-num" id="totalListings">247</div><div class="stat-label">Зар</div></div>
+  <div class="stat-box"><div class="stat-num">1,480</div><div class="stat-label">Хэрэглэгч</div></div>
+  <div class="stat-box"><div class="stat-num">98%</div><div class="stat-label">Итгэлтэй</div></div>
+  <div class="stat-box"><div class="stat-num">24/7</div><div class="stat-label">Ажилладаг</div></div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <aside class="sidebar">
+    <div class="filter-section">
+      <div class="filter-title">Үнэ (₮)</div>
+      <div class="price-range">
+        <input class="price-input" placeholder="Хамгийн бага" id="priceMin" type="number">
+        <input class="price-input" placeholder="Дээд хэмжээ" id="priceMax" type="number">
+      </div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Байдал</div>
+      <label class="filter-option"><input type="checkbox" checked> Шинэ</label>
+      <label class="filter-option"><input type="checkbox" checked> Хэрэглэсэн</label>
+      <label class="filter-option"><input type="checkbox"> Засвартай</label>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Хотхон</div>
+      <label class="filter-option"><input type="checkbox" checked> Баянзүрх</label>
+      <label class="filter-option"><input type="checkbox" checked> Сүхбаатар</label>
+      <label class="filter-option"><input type="checkbox" checked> Хан-Уул</label>
+      <label class="filter-option"><input type="checkbox"> Чингэлтэй</label>
+      <label class="filter-option"><input type="checkbox"> Налайх</label>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Хүргэлт</div>
+      <label class="filter-option"><input type="checkbox"> Хүргэлттэй</label>
+      <label class="filter-option"><input type="checkbox"> Биечлэн авах</label>
+    </div>
+    <button class="apply-btn">Шүүлт хэрэглэх</button>
+  </aside>
+
+  <main class="main">
+    <div class="main-header">
+      <span class="main-title" id="mainTitle">Бүх зар <span style="color:var(--muted);font-weight:400" id="countLabel">(12)</span></span>
+      <select class="sort-select" onchange="sortProducts(this.value)">
+        <option value="newest">Шинэ эхлээд</option>
+        <option value="cheapest">Хямд эхлээд</option>
+        <option value="expensive">Үнэтэй эхлээд</option>
+        <option value="popular">Алдартай</option>
+      </select>
+    </div>
+    <div class="grid" id="productGrid"></div>
+  </main>
+</div>
+
+<!-- BOTTOM TABS -->
+<div class="bottom-tabs">
+  <button class="tab active" onclick="setTab(this)"><span class="tab-icon">🏠</span>Нүүр</button>
+  <button class="tab" onclick="setTab(this)"><span class="tab-icon">🔍</span>Хайх</button>
+  <button class="tab" onclick="setTab(this); showList()"><span class="tab-icon">＋</span>Зарлах</button>
+  <button class="tab" onclick="setTab(this); showChatList()"><span class="tab-icon">💬</span>Чат</button>
+  <button class="tab" onclick="setTab(this)"><span class="tab-icon">👤</span>Профайл</button>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="overlay" id="productOverlay" onclick="closeProduct(event)">
+  <div class="modal" id="productModal">
+    <div class="modal-handle"></div>
+    <!-- Image slideshow -->
+    <div style="position:relative;margin-bottom:1.25rem">
+      <div class="modal-img" id="modalImg" style="border-radius:14px;overflow:hidden;cursor:pointer" onclick="openImgViewer()"></div>
+      <!-- Dot indicators -->
+      <div id="modalDots" style="display:flex;justify-content:center;gap:5px;margin-top:8px"></div>
+      <!-- Prev/next arrows -->
+      <button id="imgPrev" onclick="slideImg(-1)" style="display:none;position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);color:white;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;align-items:center;justify-content:center">‹</button>
+      <button id="imgNext" onclick="slideImg(1)" style="display:none;position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);color:white;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;align-items:center;justify-content:center">›</button>
+    </div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-price" id="modalPrice"></div>
+    <div class="delivery-info">
+      <div class="delivery-icon">🚚</div>
+      <div>
+        <div class="delivery-title">Хүргэлт боломжтой</div>
+        <div class="delivery-text">Улаанбаатар дотор 1-2 хоногт · 5,000₮ хүртэл</div>
+      </div>
+    </div>
+    <div class="modal-desc" id="modalDesc"></div>
+    <div class="seller-row">
+      <div class="seller-avatar" id="modalSellerInit"></div>
+      <div>
+        <div class="seller-name" id="modalSellerName"></div>
+        <div class="seller-stars" id="modalStars"></div>
+        <div class="seller-count" id="modalSales"></div>
+      </div>
+    </div>
+
+    <!-- Locked contact info -->
+    <div id="sellerLocked" style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:14px;padding:16px;margin-bottom:1.25rem;position:relative;overflow:hidden">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0.06;font-size:60px;pointer-events:none">🔒🔒🔒</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:20px">🔒</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:#fff">Борлуулагчийн холбоо барих мэдээлэл</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:1px">2% шимтгэл төлсний дараа нээгдэнэ</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div style="flex:1;background:rgba(255,255,255,0.08);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:18px;margin-bottom:4px">📞</div>
+          <div style="background:rgba(255,255,255,0.15);border-radius:4px;height:14px;width:80%;margin:0 auto"></div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px">Утасны дугаар</div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.08);border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:18px;margin-bottom:4px">📍</div>
+          <div style="background:rgba(255,255,255,0.15);border-radius:4px;height:14px;width:70%;margin:0 auto"></div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:4px">Байршил</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.06);border-radius:8px;padding:10px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:14px">💡</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.55)">Борлуулагчийн дугаарыг харахын тулд зөвхөн <strong style="color:#F39C12" id="lockCommAmt">—</strong> төлнө</span>
+      </div>
+    </div>
+
+    <!-- Unlocked contact info (hidden until paid) -->
+    <div id="sellerUnlocked" style="display:none;background:var(--green-light);border-radius:14px;padding:16px;margin-bottom:1.25rem;border:1.5px solid var(--green)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:18px">✅</span>
+        <div style="font-size:13px;font-weight:700;color:var(--green)">Борлуулагчийн мэдээлэл нээгдлээ!</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="background:white;border-radius:10px;padding:12px;text-align:center;border:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Бүтэн нэр</div>
+          <div style="font-size:14px;font-weight:700" id="unlockName">—</div>
+        </div>
+        <div style="background:white;border-radius:10px;padding:12px;text-align:center;border:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Дүүрэг</div>
+          <div style="font-size:14px;font-weight:700" id="unlockLoc">—</div>
+        </div>
+      </div>
+      <a id="unlockPhone" href="tel:" style="display:flex;align-items:center;justify-content:center;gap:10px;background:var(--green);color:white;border-radius:10px;padding:14px;text-decoration:none;font-weight:700;font-size:16px">
+        <span>📞</span>
+        <span id="unlockPhoneNum">—</span>
+      </a>
+      <div style="font-size:11px;color:var(--green);text-align:center;margin-top:8px">👆 Дарж шууд залгах боломжтой</div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="openChat()">💬 Чат</button>
+      <button class="btn-swap" onclick="openSwap()">🔄 Солилцох</button>
+      <button class="btn-primary" id="buyBtn" onclick="openPay()">🔓 Мэдээлэл харах · <span id="buyBtnAmt"></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT PANEL -->
+<div class="chat-overlay" id="chatOverlay" onclick="closeChat(event)">
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-avatar" id="chatAvatar">Б</div>
+      <div>
+        <div class="chat-name" id="chatSellerName">Борлуулагч</div>
+        <div class="chat-status">● Онлайн</div>
+      </div>
+      <button class="chat-close" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="msg them">Сайн байна уу! Энэ бараа байна уу? <div class="msg-time">10:24</div></div>
+      <div class="msg me">Тийм, байна. Ямар асуулт байна? <div class="msg-time">10:26</div></div>
+      <div class="msg them">Үнийн бууралт хийж болох уу? <div class="msg-time">10:27</div></div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="Мессеж бичих..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="send-btn" onclick="sendMsg()">➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIST MODAL -->
+<div class="list-overlay" id="listOverlay" onclick="closeList(event)">
+  <div class="list-modal">
+    <div class="list-title">📦 Шинэ зар оруулах</div>
+
+    <!-- IMAGE UPLOAD -->
+    <div class="form-group">
+      <label class="form-label">Зураг <span style="color:var(--red)">*</span> <span style="font-weight:400;color:var(--muted)">(хамгийн ихдээ 6)</span></label>
+
+      <!-- Hidden inputs — capture=environment = арын камер -->
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none" onchange="handleImgFile(this)">
+      <input type="file" id="galleryInput" accept="image/*" multiple style="display:none" onchange="handleImgFiles(this)">
+
+      <!-- Photo previews -->
+      <div id="photoGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px"></div>
+
+      <!-- Add photo buttons -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="addPhotoRow">
+        <button onclick="document.getElementById('cameraInput').click()"
+          style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);cursor:pointer;font-family:Inter,sans-serif;color:var(--text);transition:border-color 0.15s"
+          onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:28px">📷</span>
+          <span style="font-size:12px;font-weight:600">Камер</span>
+          <span style="font-size:10px;color:var(--muted)">Шууд зураг авах</span>
+        </button>
+        <button onclick="document.getElementById('galleryInput').click()"
+          style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;border:1.5px dashed var(--border);border-radius:12px;background:var(--bg);cursor:pointer;font-family:Inter,sans-serif;color:var(--text);transition:border-color 0.15s"
+          onmouseover="this.style.borderColor='var(--red)'" onmouseout="this.style.borderColor='var(--border)'">
+          <span style="font-size:28px">🖼️</span>
+          <span style="font-size:12px;font-weight:600">Галлерей</span>
+          <span style="font-size:10px;color:var(--muted)">Хадгалсан зургаас</span>
+        </button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;text-align:center" id="photoHint">Эхний зураг нүүр зураг болно · Дарж эрэмбэлэх боломжтой</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Гарчиг</label>
+      <input class="form-input" placeholder="жнь: iPhone 14 Pro Max 256GB" id="listTitle">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Үнэ (₮)</label>
+        <input class="form-input" type="number" placeholder="1,200,000" id="listPrice">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ангилал</label>
+        <select class="form-select" id="listCat">
+          <option>📱 Электроник</option>
+          <option>👗 Хувцас</option>
+          <option>🏠 Гэрийн эд</option>
+          <option>🚗 Машин</option>
+          <option>⚽ Спорт</option>
+          <option>📚 Ном</option>
+          <option>🧸 Хүүхдийн</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Байдал</label>
+        <select class="form-select" id="listCond">
+          <option>Шинэ</option>
+          <option>Маш сайн</option>
+          <option>Сайн</option>
+          <option>Хэрэглэсэн</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Дүүрэг</label>
+        <select class="form-select">
+          <option>Баянзүрх</option>
+          <option>Сүхбаатар</option>
+          <option>Хан-Уул</option>
+          <option>Чингэлтэй</option>
+          <option>Налайх</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Утасны дугаар <span style="color:var(--red)">*</span></label>
+      <input class="form-input" type="tel" placeholder="жнь: 9911 2233" id="listPhone" maxlength="12">
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">🔒 Зөвхөн 2% шимтгэл төлсөн худалдан авагчид харагдана</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Тайлбар</label>
+      <textarea class="form-textarea" placeholder="Барааны дэлгэрэнгүй мэдээлэл..." id="listDesc"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Хүргэлт</label>
+      <select class="form-select">
+        <option>Хүргэлт боломжтой (5,000₮)</option>
+        <option>Биечлэн авах</option>
+        <option>Хоёулаа боломжтой</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeList()">Буцах</button>
+      <button class="btn-primary" onclick="submitListing()">✅ Зар нийтлэх</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="pay-overlay" id="payOverlay" onclick="closePay(event)">
+  <div class="pay-modal">
+    <div class="pay-title">💳 Төлбөр баталгаажуулах</div>
+    <div class="pay-subtitle">Аюулгүй, хурдан төлбөр · Худалдаа·мн</div>
+
+    <!-- Price breakdown -->
+    <div style="background:var(--bg);border-radius:14px;padding:16px;margin-bottom:1.25rem">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:13px;color:var(--muted)">Барааны үнэ</span>
+        <span style="font-size:14px;font-weight:600" id="payBase">1,200,000₮</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:13px;color:var(--muted)">Платформын шимтгэл <span style="background:#EDE8FA;color:#6C3FC5;font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:4px">2%</span></span>
+        <span style="font-size:14px;font-weight:600;color:#6C3FC5" id="payComm">24,000₮</span>
+      </div>
+      <div style="border-top:1px dashed var(--border);margin:10px 0"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:14px;font-weight:700">Нийт төлөх дүн</span>
+        <span style="font-size:20px;font-weight:700;color:var(--red)" id="payTotal">1,224,000₮</span>
+      </div>
+    </div>
+
+    <!-- Seller gets -->
+    <div style="background:var(--green-light);border-radius:10px;padding:12px;margin-bottom:1.25rem;display:flex;gap:10px;align-items:center">
+      <span style="font-size:20px">💸</span>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--green)">Борлуулагч хүлээн авах дүн</div>
+        <div style="font-size:15px;font-weight:700;color:var(--green)" id="paySeller">1,200,000₮</div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="font-size:12px;font-weight:600;color:#6C3FC5">Платформд орох</div>
+        <div style="font-size:15px;font-weight:700;color:#6C3FC5" id="payPlatform">24,000₮</div>
+      </div>
+    </div>
+
+    <div class="pay-methods" id="payMethods">
+      <div class="pay-method selected" onclick="selectPay(this)">
+        <span class="pay-method-icon">🏦</span>
+        <div>
+          <div class="pay-method-name">Хаан банк</div>
+          <div class="pay-method-desc">Шууд шилжүүлэг</div>
+        </div>
+      </div>
+      <div class="pay-method" onclick="selectPay(this)">
+        <span class="pay-method-icon">💙</span>
+        <div>
+          <div class="pay-method-name">Most Money</div>
+          <div class="pay-method-desc">Монголын хамгийн том wallet</div>
+        </div>
+      </div>
+      <div class="pay-method" onclick="selectPay(this)">
+        <span class="pay-method-icon">🟠</span>
+        <div>
+          <div class="pay-method-name">QPay</div>
+          <div class="pay-method-desc">QR кодоор төлөх</div>
+        </div>
+      </div>
+      <div class="pay-method" onclick="selectPay(this)">
+        <span class="pay-method-icon">💳</span>
+        <div>
+          <div class="pay-method-name">Карт</div>
+          <div class="pay-method-desc">Visa / Mastercard</div>
+        </div>
+      </div>
+    </div>
+    <div class="pay-actions">
+      <button class="btn-secondary" onclick="closePay()">Буцах</button>
+      <button class="btn-primary" onclick="confirmPay()">✅ Батлах</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="pay-overlay" id="adminOverlay" onclick="closeAdmin(event)" style="align-items:center">
+  <div style="background:var(--surface);border-radius:18px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:1.5rem;animation:fadeIn 0.2s ease">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+      <div>
+        <div style="font-size:18px;font-weight:700">⚙️ Админ самбар</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Худалдаа·мн платформ</div>
+      </div>
+      <button onclick="closeAdmin()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+
+    <!-- Stats cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1.5rem">
+      <div style="background:var(--green-light);border-radius:12px;padding:14px">
+        <div style="font-size:11px;font-weight:600;color:var(--green);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px">Нийт орлого</div>
+        <div style="font-size:22px;font-weight:700;color:var(--green)" id="adminEarnings">0₮</div>
+        <div style="font-size:11px;color:var(--green);margin-top:4px">2% шимтгэлийн нийлбэр</div>
+      </div>
+      <div style="background:#EDE8FA;border-radius:12px;padding:14px">
+        <div style="font-size:11px;font-weight:600;color:#6C3FC5;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px">Нийт гүйлгээ</div>
+        <div style="font-size:22px;font-weight:700;color:#6C3FC5" id="adminSales">0</div>
+        <div style="font-size:11px;color:#6C3FC5;margin-top:4px">амжилттай борлуулалт</div>
+      </div>
+      <div style="background:var(--gold-light);border-radius:12px;padding:14px">
+        <div style="font-size:11px;font-weight:600;color:#875A12;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px">Идэвхтэй зар</div>
+        <div style="font-size:22px;font-weight:700;color:#875A12" id="adminListings">12</div>
+        <div style="font-size:11px;color:#875A12;margin-top:4px">нийт бараа</div>
+      </div>
+      <div style="background:var(--blue-light);border-radius:12px;padding:14px">
+        <div style="font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:6px">Хэрэглэгч</div>
+        <div style="font-size:22px;font-weight:700;color:var(--blue)">1,480</div>
+        <div style="font-size:11px;color:var(--blue);margin-top:4px">бүртгэлтэй</div>
+      </div>
+    </div>
+
+    <!-- Commission setting -->
+    <div style="border:1.5px solid #6C3FC5;border-radius:14px;padding:16px;margin-bottom:1.5rem">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px;color:#6C3FC5">💰 Шимтгэлийн хувь тохируулах</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px">Одоогийн: <strong id="currentCommRate">2%</strong> · Борлуулагч бүрийн орлогоос автоматаар суурилна</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <input type="range" min="1" max="10" value="2" step="0.5" id="commSlider" oninput="updateCommPreview(this.value)" style="flex:1">
+        <div style="background:#EDE8FA;color:#6C3FC5;font-size:16px;font-weight:700;padding:6px 14px;border-radius:8px;min-width:52px;text-align:center" id="commSliderVal">2%</div>
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:12px">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Жишээ тооцоо:</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span>1,000,000₮ барааны шимтгэл</span>
+          <span style="font-weight:600;color:#6C3FC5" id="previewComm1">20,000₮</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span>2,500,000₮ барааны шимтгэл</span>
+          <span style="font-weight:600;color:#6C3FC5" id="previewComm2">50,000₮</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px">
+          <span>100,000₮ барааны шимтгэл</span>
+          <span style="font-weight:600;color:#6C3FC5" id="previewComm3">2,000₮</span>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="saveCommRate()" style="font-size:13px;padding:10px">💾 Хадгалах</button>
+    </div>
+
+    <!-- Recent transactions -->
+    <div>
+      <div style="font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);margin-bottom:10px">Сүүлийн гүйлгээнүүд</div>
+      <div id="adminTxList">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:22px">📱</span>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">iPhone 14 Pro Max</div><div style="font-size:11px;color:var(--muted)">Болд Н. → Ганзориг Б. · Өнөөдөр</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--green)">+56,000₮</div><div style="font-size:10px;color:var(--muted)">2,800,000₮-ийн 2%</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:22px">💻</span>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">MacBook Air M2</div><div style="font-size:11px;color:var(--muted)">Сарнай Д. → Дорж Х. · Өчигдөр</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--green)">+70,000₮</div><div style="font-size:10px;color:var(--muted)">3,500,000₮-ийн 2%</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 0">
+          <span style="font-size:22px">🎮</span>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">PlayStation 5</div><div style="font-size:11px;color:var(--muted)">Дорж Х. → Батбаяр Т. · 2 өдрийн өмнө</div></div>
+          <div style="text-align:right"><div style="font-size:13px;font-weight:700;color:var(--green)">+44,000₮</div><div style="font-size:10px;color:var(--muted)">2,200,000₮-ийн 2%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SWAP MODAL -->
+<div class="swap-overlay" id="swapOverlay" onclick="closeSwap(event)">
+  <div class="swap-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <div>
+        <div class="swap-title">🔄 Солилцох хүсэлт</div>
+        <div class="swap-sub">Өөрийн барааг санал болгоорой</div>
+      </div>
+      <button onclick="closeSwap()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <div class="swap-section-title">Авахыг хүссэн бараа</div>
+    <div class="swap-target" id="swapTargetBox"></div>
+    <div class="swap-arrow">⇅</div>
+    <div class="swap-section-title">Миний санал болгох бараа</div>
+    <div class="my-items-grid" id="myItemsGrid"></div>
+    <div class="swap-diff">
+      <label>Нэмэлт мөнгө:</label>
+      <input type="number" id="swapExtra" placeholder="0" min="0">
+      <span>₮ (заавал биш)</span>
+    </div>
+    <label class="swap-note-label">Нэмэлт тайлбар</label>
+    <textarea class="swap-note" id="swapNote" placeholder="жнь: Миний бараа маш сайн байдалтай, ямар нэг асуулт байвал хэлнэ үү..."></textarea>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeSwap()">Буцах</button>
+      <button class="btn-swap" onclick="submitSwap()">✅ Хүсэлт илгээх</button>
+    </div>
+  </div>
+</div>
+
+<!-- SWAP REQUESTS PANEL -->
+<div class="req-overlay" id="reqOverlay" onclick="closeRequests(event)">
+  <div class="req-panel">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+      <div class="req-title">🔄 Солилцох хүсэлтүүд <span id="reqCount" style="background:#EDE8FA;color:#6C3FC5;font-size:13px;padding:2px 10px;border-radius:10px;font-weight:600"></span></div>
+      <button onclick="closeRequests()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <div id="reqList"></div>
+  </div>
+</div>
+
+<!-- FULLSCREEN IMAGE VIEWER -->
+<div id="imgViewerOverlay" style="display:none;position:fixed;inset:0;background:#000;z-index:900;flex-direction:column;align-items:center;justify-content:center">
+  <button onclick="closeImgViewer()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:white;font-size:22px;width:40px;height:40px;border-radius:50%;cursor:pointer">✕</button>
+  <img id="imgViewerImg" src="" style="max-width:100%;max-height:85vh;object-fit:contain;border-radius:8px">
+  <div id="imgViewerDots" style="display:flex;gap:6px;margin-top:16px"></div>
+  <button onclick="viewerSlide(-1)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:white;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer">‹</button>
+  <button onclick="viewerSlide(1)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:white;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer">›</button>
+  <div id="imgViewerCount" style="position:absolute;top:16px;left:16px;color:rgba(255,255,255,0.7);font-size:13px;font-weight:500"></div>
+</div>
+
+<!-- NOTIFICATION POPUPS -->
+<div class="notif-popup" id="notifPopup"></div>
+
+<!-- NOTIFICATION CENTER -->
+<div class="notif-center" id="notifCenter" onclick="closeNotifCenter(event)">
+  <div class="notif-panel">
+    <div class="notif-panel-header">
+      <span class="notif-panel-title">🔔 Мэдэгдлүүд</span>
+      <button class="notif-panel-clear" onclick="clearAllNotifs()">Бүгдийг устгах</button>
+    </div>
+    <div class="notif-sub" id="notifSubLabel">Шинэ бараа орох бүрд энд харагдана</div>
+    <div id="notifCenterList"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const products = [
+  { id:1, emoji:'📱', title:'iPhone 14 Pro Max 256GB', price:2800000, cat:'electronics', cond:'new', loc:'Баянзүрх', seller:'Болд Н.', phone:'9911-2233', rating:4.9, sales:47, swappable:true, desc:'Огт хэрэглэгдээгүй, бүрэн нааш. Хайрцагтайгаа байна. Аливаа асуулт хүлээн авна.' },
+  { id:2, emoji:'💻', title:'MacBook Air M2 2023', price:3500000, cat:'electronics', cond:'used', loc:'Хан-Уул', seller:'Сарнай Д.', phone:'8822-4455', rating:4.8, sales:22, swappable:true, desc:'2023 оны загвар, M2 чип. 8GB RAM, 256GB SSD. Ажиллагаа маш сайн байна.' },
+  { id:3, emoji:'👟', title:'Nike Air Jordan 1 Retro', price:350000, cat:'clothes', cond:'new', loc:'Сүхбаатар', seller:'Ганзориг Б.', phone:'9955-6677', rating:5.0, sales:63, swappable:false, desc:'Original Nike Jordan. Хэмжээ 42. Дэлгүүрийн үнэ 650,000₮. Бэлэг авсан тул зарж байна.' },
+  { id:4, emoji:'🛋️', title:'Ухаалаг диван (3+2)', price:890000, cat:'home', cond:'used', loc:'Баянзүрх', seller:'Энхтуяа М.', phone:'9933-1122', rating:4.7, sales:15, swappable:true, desc:'Хэрэглэсэн боловч байдал маш сайн. Цэнхэр өнгийн. Нүүлгэлт дэмжинэ.' },
+  { id:5, emoji:'📷', title:'Canon EOS R50 + 18-45mm', price:1650000, cat:'electronics', cond:'new', loc:'Чингэлтэй', seller:'Батбаяр Т.', phone:'9900-8866', rating:4.9, sales:31, swappable:true, desc:'Шинэ, хайрцагнаасаа гараагүй. Гэрэл зурагчдад тохиромжтой.' },
+  { id:6, emoji:'🚲', title:'Trek Mountain Bike 2022', price:750000, cat:'sports', cond:'used', loc:'Хан-Уул', seller:'Мөнхбаяр С.', phone:'9977-3344', rating:4.6, sales:8, swappable:true, desc:'Trek брэнд, 21 хурдтай. Хэрэглэсэн боловч техникийн байдал сайн.' },
+  { id:7, emoji:'📚', title:'Монгол хэлний тайлбар толь', price:45000, cat:'books', cond:'new', loc:'Сүхбаатар', seller:'Цэцэг Л.', phone:'8811-5599', rating:5.0, sales:102, swappable:false, desc:'Шинэ ном. Монгол хэлний иж бүрэн толь бичиг. Хүүхэд болон насандүй хүмүүст тохиромжтой.' },
+  { id:8, emoji:'🧸', title:'LEGO City Set 60314', price:180000, cat:'kids', cond:'new', loc:'Баянзүрх', seller:'Наранцэцэг О.', phone:'9944-7788', rating:4.8, sales:29, swappable:true, desc:'Original LEGO. Задалдаагүй хайрцагтай. 5-12 насны хүүхдэд. Бэлэгт тохиромжтой.' },
+  { id:9, emoji:'🎮', title:'PlayStation 5 Disk Edition', price:2200000, cat:'electronics', cond:'used', loc:'Сүхбаатар', seller:'Дорж Х.', phone:'9922-0011', rating:4.7, sales:5, swappable:true, desc:'PS5 Disk edition, 2 controller хамт. 4 тоглоом оруулж өгнө. Байдал маш сайн.' },
+  { id:10, emoji:'👔', title:'Hugo Boss костюм (52р)', price:450000, cat:'clothes', cond:'used', loc:'Хан-Уул', seller:'Пүрэвдорж Г.', phone:'9966-4433', rating:4.9, sales:18, swappable:false, desc:'Original Hugo Boss. 2-3 удаа өмссөн. Хуримын болон ажлын зориулалттай.' },
+  { id:11, emoji:'🍳', title:'Ninja Air Fryer 5.7L', price:320000, cat:'home', cond:'new', loc:'Чингэлтэй', seller:'Батцэцэг Э.', phone:'8800-9955', rating:5.0, sales:44, swappable:true, desc:'Шинэ, хэрэглэгдээгүй. Бэлэг авсан боловч ижил загвар байсан тул зарж байна.' },
+  { id:12, emoji:'⚽', title:'Adidas UEFA Ball 2024', price:95000, cat:'sports', cond:'new', loc:'Баянзүрх', seller:'Гантулга П.', phone:'9988-2266', rating:4.8, sales:37, swappable:false, desc:'Original Adidas UEFA Champions League бөмбөг. Агуулах байдлаасаа гарч байна.' },
+];
+
+let currentProduct = null;
+let likedProducts = new Set();
+let filtered = [...products];
+
+function render(list) {
+  const grid = document.getElementById('productGrid');
+  document.getElementById('countLabel').textContent = `(${list.length})`;
+  grid.innerHTML = list.map(p => `
+    <div class="card" onclick="openProduct(${p.id})">
+      <div class="card-img" style="${p.photos&&p.photos[0]?'background:none;padding:0':''}">
+        ${p.photos&&p.photos[0]
+          ? `<img src="${p.photos[0]}" style="width:100%;height:100%;object-fit:cover;display:block">`
+          : p.emoji}
+        <button class="card-like ${likedProducts.has(p.id)?'liked':''}" onclick="event.stopPropagation();toggleLike(${p.id},this)">
+          ${likedProducts.has(p.id)?'❤️':'🤍'}
+        </button>
+        ${p.swappable ? '<span class="swap-tag">🔄 Солилцоно</span>' : ''}
+      </div>
+      <div class="card-body">
+        <div class="card-title">${p.title}</div>
+        <div class="card-price">${p.price.toLocaleString()}<span>₮</span></div>
+        <div class="card-meta">
+          <span class="card-loc">📍 ${p.loc}</span>
+          <span class="card-cond ${p.cond==='used'?'used':''}">${p.cond==='new'?'Шинэ':'Хэрэглэсэн'}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleLike(id, btn) {
+  if(likedProducts.has(id)) { likedProducts.delete(id); btn.innerHTML='🤍'; btn.classList.remove('liked'); showToast('Хадгаласнаас хасагдлаа'); }
+  else { likedProducts.add(id); btn.innerHTML='❤️'; btn.classList.add('liked'); showToast('❤️ Хадгаллаа'); }
+}
+
+function openProduct(id) {
+  currentProduct = products.find(p=>p.id===id);
+  const p = currentProduct;
+
+  // Photo gallery
+  if(p.photos && p.photos.length > 0) {
+    document.getElementById('modalImg').innerHTML = `
+      <div style="position:relative;width:100%;height:100%">
+        <img id="mainPhoto" src="${p.photos[0]}" style="width:100%;height:100%;object-fit:cover;display:block">
+        ${p.photos.length > 1 ? `
+          <button onclick="prevPhoto()" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:white;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">‹</button>
+          <button onclick="nextPhoto()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.45);border:none;color:white;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">›</button>
+          <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:5px" id="photoDots">
+            ${p.photos.map((_,i)=>`<div onclick="goPhoto(${i})" style="width:7px;height:7px;border-radius:50%;background:${i===0?'white':'rgba(255,255,255,0.5)'};cursor:pointer;transition:background 0.15s" id="dot_${i}"></div>`).join('')}
+          </div>
+        ` : ''}
+      </div>`;
+    window._currentPhotoIdx = 0;
+  } else {
+    document.getElementById('modalImg').innerHTML = `<span style="font-size:80px">${p.emoji}</span>`;
+  }
+
+  document.getElementById('modalTitle').textContent = p.title;
+  document.getElementById('modalPrice').textContent = p.price.toLocaleString() + '₮';
+  document.getElementById('modalDesc').textContent = p.desc;
+  document.getElementById('modalSellerInit').textContent = p.seller[0];
+  document.getElementById('modalSellerName').textContent = p.seller;
+  document.getElementById('modalStars').textContent = '★'.repeat(Math.round(p.rating)) + ' ' + p.rating;
+  document.getElementById('modalSales').textContent = `${p.sales} борлуулалт хийсэн`;
+
+  const rate = window._commRate || COMMISSION_RATE;
+  const comm = Math.round(p.price * rate);
+  document.getElementById('lockCommAmt').textContent = comm.toLocaleString() + '₮';
+  document.getElementById('buyBtnAmt').textContent = comm.toLocaleString() + '₮';
+
+  document.getElementById('sellerLocked').style.display = 'block';
+  document.getElementById('sellerUnlocked').style.display = 'none';
+  document.getElementById('buyBtn').style.display = '';
+  document.getElementById('productOverlay').classList.add('show');
+}
+
+function goPhoto(i) {
+  const p = currentProduct;
+  if(!p || !p.photos) return;
+  window._currentPhotoIdx = i;
+  document.getElementById('mainPhoto').src = p.photos[i];
+  p.photos.forEach((_,j) => {
+    const d = document.getElementById('dot_'+j);
+    if(d) d.style.background = j===i ? 'white' : 'rgba(255,255,255,0.5)';
+  });
+}
+function nextPhoto() {
+  const p = currentProduct;
+  if(!p||!p.photos) return;
+  goPhoto((window._currentPhotoIdx+1) % p.photos.length);
+}
+function prevPhoto() {
+  const p = currentProduct;
+  if(!p||!p.photos) return;
+  goPhoto((window._currentPhotoIdx - 1 + p.photos.length) % p.photos.length);
+}
+
+function closeProduct(e) {
+  if(!e || e.target===document.getElementById('productOverlay'))
+    document.getElementById('productOverlay').classList.remove('show');
+}
+
+function openChat() {
+  const p = currentProduct;
+  document.getElementById('chatAvatar').textContent = p ? p.seller[0] : 'Б';
+  document.getElementById('chatSellerName').textContent = p ? p.seller : 'Борлуулагч';
+  document.getElementById('productOverlay').classList.remove('show');
+  document.getElementById('chatOverlay').classList.add('show');
+}
+
+function showChatList() { document.getElementById('chatOverlay').classList.add('show'); }
+
+function closeChat(e) {
+  if(!e || e.target===document.getElementById('chatOverlay'))
+    document.getElementById('chatOverlay').classList.remove('show');
+}
+
+function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if(!text) return;
+  const msgs = document.getElementById('chatMessages');
+  const now = new Date(); const t = now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
+  msgs.innerHTML += `<div class="msg me">${text}<div class="msg-time">${t}</div></div>`;
+  input.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(()=>{
+    const replies = ['Ойлголоо, хариулъя!', 'Тийм байна, ирж авах боломжтой.', 'Үнийн талаар ярилцаж болно.', 'Та хэдэн цагт чөлөөтэй байна?'];
+    const r = replies[Math.floor(Math.random()*replies.length)];
+    msgs.innerHTML += `<div class="msg them">${r}<div class="msg-time">${t}</div></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1000 + Math.random()*1000);
+}
+
+const COMMISSION_RATE = 0.02; // 2% — энд өөрчлөх боломжтой
+let totalEarnings = 0;
+let totalSales = 0;
+
+function openPay() {
+  if(!currentProduct) return;
+  const rate = window._commRate || COMMISSION_RATE;
+  const base = currentProduct.price;
+  const comm = Math.round(base * rate);
+  const total = base + comm;
+  document.getElementById('payBase').textContent = base.toLocaleString() + '₮';
+  document.getElementById('payComm').textContent = comm.toLocaleString() + '₮';
+  document.getElementById('payTotal').textContent = total.toLocaleString() + '₮';
+  document.getElementById('paySeller').textContent = base.toLocaleString() + '₮';
+  document.getElementById('payPlatform').textContent = comm.toLocaleString() + '₮';
+  // Update label
+  const pct = Math.round((rate)*100);
+  document.querySelector('#payOverlay .pay-subtitle').textContent = `Аюулгүй, хурдан төлбөр · ${pct}% шимтгэл`;
+  document.getElementById('productOverlay').classList.remove('show');
+  document.getElementById('payOverlay').classList.add('show');
+}
+
+function closePay(e) {
+  if(!e || e.target===document.getElementById('payOverlay'))
+    document.getElementById('payOverlay').classList.remove('show');
+}
+
+function selectPay(el) {
+  document.querySelectorAll('.pay-method').forEach(m=>m.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function confirmPay() {
+  if(!currentProduct) return;
+  const base = currentProduct.price;
+  const comm = Math.round(base * (window._commRate || COMMISSION_RATE));
+  totalEarnings += comm;
+  totalSales += 1;
+  document.getElementById('payOverlay').classList.remove('show');
+  updateAdminStats();
+
+  // Борлуулагчийн мэдээлэл нээх
+  const p = currentProduct;
+  document.getElementById('sellerLocked').style.display = 'none';
+  document.getElementById('sellerUnlocked').style.display = 'block';
+  document.getElementById('unlockName').textContent = p.seller;
+  document.getElementById('unlockLoc').textContent = p.loc;
+  document.getElementById('unlockPhoneNum').textContent = p.phone || '9900-0000';
+  document.getElementById('unlockPhone').href = 'tel:' + (p.phone||'').replace(/[^0-9]/g,'');
+  document.getElementById('buyBtn').style.display = 'none';
+
+  // Бараа дэлгэрэнгүй цонхыг дахин нээх
+  document.getElementById('productOverlay').classList.add('show');
+  showToast('✅ Төлбөр амжилттай! Борлуулагчийн дугаар нээгдлээ 🔓');
+}
+
+function showList() { document.getElementById('listOverlay').classList.add('show'); }
+function closeList(e) {
+  if(!e || e.target===document.getElementById('listOverlay'))
+    document.getElementById('listOverlay').classList.remove('show');
+}
+
+// ===== NOTIFICATION SYSTEM =====
+let notifications = [];
+let unreadCount = 0;
+
+// Жишээ мэдэгдлүүд — аппыг нээхэд харуулна
+const seedNotifs = [
+  { id:'n1', emoji:'📱', title:'iPhone 14 Pro Max 256GB', seller:'Болд Н.', price:2800000, loc:'Баянзүрх', cat:'Электроник', time:'2 минутын өмнө', read:false, productId:1 },
+  { id:'n2', emoji:'🎮', title:'PlayStation 5 Disk Edition', seller:'Дорж Х.', price:2200000, loc:'Сүхбаатар', cat:'Электроник', time:'15 минутын өмнө', read:false, productId:9 },
+  { id:'n3', emoji:'👟', title:'Nike Air Jordan 1 Retro', seller:'Ганзориг Б.', price:350000, loc:'Сүхбаатар', cat:'Хувцас', time:'1 цагийн өмнө', read:true, productId:3 },
+  { id:'n4', emoji:'🛋️', title:'Ухаалаг диван (3+2)', seller:'Энхтуяа М.', price:890000, loc:'Баянзүрх', cat:'Гэрийн эд', time:'3 цагийн өмнө', read:true, productId:4 },
+];
+notifications = [...seedNotifs];
+unreadCount = notifications.filter(n=>!n.read).length;
+
+function updateNotifBadge() {
+  const badge = document.getElementById('notifBadge');
+  if(unreadCount > 0) {
+    badge.style.display = 'block';
+    badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function pushNotification(notif) {
+  notifications.unshift(notif);
+  unreadCount++;
+  updateNotifBadge();
+  showNotifPopup(notif);
+}
+
+function showNotifPopup(notif) {
+  const container = document.getElementById('notifPopup');
+  const el = document.createElement('div');
+  el.className = 'notif-item';
+  el.innerHTML = `
+    <span class="notif-emoji">${notif.emoji}</span>
+    <div class="notif-body">
+      <div class="notif-label">🆕 Шинэ зар орлоо!</div>
+      <div class="notif-title">${notif.title}</div>
+      <div class="notif-meta">📍 ${notif.loc} · 👤 ${notif.seller}</div>
+      <div class="notif-progress"></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <span class="notif-price">${notif.price.toLocaleString()}₮</span>
+      <button class="notif-close" onclick="dismissPopup(this)">✕</button>
+    </div>
+  `;
+  el.onclick = (e) => {
+    if(e.target.classList.contains('notif-close')) return;
+    dismissPopup(el.querySelector('.notif-close'));
+    const p = products.find(x=>x.id===notif.productId);
+    if(p) { currentProduct=p; openProduct(p.id); }
+  };
+  container.appendChild(el);
+  // Автоматаар 5 секундын дараа хаах
+  setTimeout(() => dismissPopup(el.querySelector('.notif-close')), 5000);
+}
+
+function dismissPopup(closeBtn) {
+  const el = closeBtn.closest('.notif-item');
+  if(!el) return;
+  el.classList.add('exit');
+  setTimeout(() => el.remove(), 300);
+}
+
+function toggleNotifCenter() {
+  const c = document.getElementById('notifCenter');
+  if(c.classList.contains('show')) {
+    c.classList.remove('show');
+  } else {
+    renderNotifCenter();
+    c.classList.add('show');
+    // Бүгдийг уншсан болгох
+    notifications.forEach(n=>n.read=true);
+    unreadCount = 0;
+    updateNotifBadge();
+  }
+}
+
+function closeNotifCenter(e) {
+  if(e && e.target === document.getElementById('notifCenter'))
+    document.getElementById('notifCenter').classList.remove('show');
+}
+
+function renderNotifCenter() {
+  const list = document.getElementById('notifCenterList');
+  const unread = notifications.filter(n=>!n.read).length;
+  document.getElementById('notifSubLabel').textContent =
+    unread > 0 ? `${unread} уншаагүй мэдэгдэл байна` : 'Бүх мэдэгдлийг уншсан';
+
+  if(notifications.length === 0) {
+    list.innerHTML = '<div class="notif-empty">🔔<br><br>Мэдэгдэл байхгүй байна<br><span style="font-size:12px">Шинэ зар орохоор энд харагдана</span></div>';
+    return;
+  }
+  list.innerHTML = notifications.map(n=>`
+    <div class="notif-row ${n.read?'':'unread'}" onclick="notifRowClick('${n.id}',${n.productId||0})">
+      <div class="notif-row-dot ${n.read?'read':''}"></div>
+      <span class="notif-row-emoji">${n.emoji}</span>
+      <div class="notif-row-body">
+        <div class="notif-row-title">${n.title}</div>
+        <div class="notif-row-time">📍 ${n.loc} · ${n.cat} · ${n.time}</div>
+      </div>
+      <span class="notif-row-price">${n.price.toLocaleString()}₮</span>
+    </div>
+  `).join('');
+}
+
+function notifRowClick(nid, pid) {
+  document.getElementById('notifCenter').classList.remove('show');
+  const p = products.find(x=>x.id===pid);
+  if(p) openProduct(p.id);
+}
+
+function clearAllNotifs() {
+  notifications = [];
+  unreadCount = 0;
+  updateNotifBadge();
+  renderNotifCenter();
+}
+
+function submitListing() {
+  const t = document.getElementById('listTitle').value.trim();
+  const p = document.getElementById('listPrice').value.trim();
+  const cat = document.getElementById('listCat').value;
+  const desc = document.getElementById('listDesc').value.trim();
+  if(!t || !p) { showToast('⚠️ Гарчиг болон үнэ оруулна уу'); return; }
+
+  const catEmojis = {'📱 Электроник':'📱','👗 Хувцас':'👗','🏠 Гэрийн эд':'🏠','🚗 Машин':'🚗','⚽ Спорт':'⚽','📚 Ном':'📚','🧸 Хүүхдийн':'🧸'};
+  const emoji = catEmojis[cat] || '📦';
+  const price = parseInt(p.replace(/,/g,'')) || 0;
+  const newId = Date.now();
+
+  const newProduct = {
+    id: newId, emoji, title: t, price, cat: 'new',
+    cond: document.getElementById('listCond').value==='Шинэ'?'new':'used',
+    loc: 'Улаанбаатар', seller: 'Та',
+    phone: document.getElementById('listPhone').value.trim() || '—',
+    rating: 5.0, sales: 0, swappable: true,
+    desc: desc || 'Шинэ зар',
+    photos: [...uploadedPhotos]
+  };
+  products.unshift(newProduct);
+  filtered.unshift(newProduct);
+  render(filtered);
+
+  closeList();
+  document.getElementById('listTitle').value='';
+  document.getElementById('listPrice').value='';
+  document.getElementById('listDesc').value='';
+  document.getElementById('listPhone').value='';
+  uploadedPhotos = [];
+  renderPhotoGrid();
+
+  const n = parseInt(document.getElementById('totalListings').textContent);
+  document.getElementById('totalListings').textContent = n+1;
+  document.getElementById('adminListings').textContent = products.length;
+
+  const notif = {
+    id: 'n'+Date.now(), emoji, title: t, seller: 'Та',
+    price, loc: 'Улаанбаатар', cat: cat.replace(/^\S+\s/,''),
+    time: 'Дөнгөж сая', read: false, productId: newId
+  };
+  pushNotification(notif);
+  setTimeout(()=>{ showToast('🔔 1,480 хэрэглэгчид мэдэгдэл очлоо!'); }, 800);
+}
+
+function filterCat(btn, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filtered = cat==='all' ? [...products] : products.filter(p=>p.cat===cat);
+  render(filtered);
+}
+
+function sortProducts(val) {
+  const copy = [...filtered];
+  if(val==='cheapest') copy.sort((a,b)=>a.price-b.price);
+  else if(val==='expensive') copy.sort((a,b)=>b.price-a.price);
+  else if(val==='popular') copy.sort((a,b)=>b.sales-a.sales);
+  else copy.sort((a,b)=>b.id-a.id);
+  render(copy);
+}
+
+function setTab(btn) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  const r = products.filter(p=>p.title.toLowerCase().includes(q)||p.loc.toLowerCase().includes(q));
+  render(r);
+});
+
+const myItems = [
+  { id:101, emoji:'🎧', title:'Sony WH-1000XM5', price:650000 },
+  { id:102, emoji:'⌚', title:'Samsung Galaxy Watch 5', price:420000 },
+  { id:103, emoji:'🖥️', title:'LG 27" Monitor 4K', price:980000 },
+  { id:104, emoji:'👜', title:'Leather Backpack', price:180000 },
+  { id:105, emoji:'📸', title:'GoPro Hero 11', price:890000 },
+  { id:106, emoji:'🎸', title:'Acoustic Guitar', price:350000 },
+];
+
+let selectedMyItem = null;
+let swapRequests = [
+  { id:1, type:'incoming', from:'Сарнай Д.', fromInit:'С', theirItem:{emoji:'💻',title:'MacBook Air M2',price:3500000}, myItem:{emoji:'📱',title:'iPhone 14 Pro Max',price:2800000}, note:'Тааламжтай саналаа хүлээж байна!', time:'2 цагийн өмнө', status:'pending' },
+  { id:2, type:'incoming', from:'Дорж Х.', fromInit:'Д', theirItem:{emoji:'🎮',title:'PlayStation 5',price:2200000}, myItem:{emoji:'🎧',title:'Sony WH-1000XM5',price:650000}, note:'Нэмэлт 200,000₮ нэмж өгч болно.', time:'Өчигдөр', status:'pending' },
+  { id:3, type:'outgoing', from:'Болд Н.', fromInit:'Б', theirItem:{emoji:'📱',title:'iPhone 14 Pro',price:2800000}, myItem:{emoji:'⌚',title:'Galaxy Watch 5',price:420000}, note:'', time:'3 өдрийн өмнө', status:'accepted' },
+];
+
+function openSwap() {
+  const p = currentProduct;
+  if(!p) return;
+  document.getElementById('swapTargetBox').innerHTML = `
+    <span class="swap-target-emoji">${p.emoji}</span>
+    <div>
+      <div class="swap-target-title">${p.title}</div>
+      <div class="swap-target-seller">👤 ${p.seller} · 📍 ${p.loc}</div>
+    </div>
+    <div style="margin-left:auto;font-size:14px;font-weight:700;color:#6C3FC5">${p.price.toLocaleString()}₮</div>
+  `;
+  selectedMyItem = null;
+  document.getElementById('swapExtra').value = '';
+  document.getElementById('swapNote').value = '';
+  document.getElementById('myItemsGrid').innerHTML = myItems.map(m=>`
+    <div class="my-item" id="mi_${m.id}" onclick="selectMyItem(${m.id})">
+      <div class="my-item-img">${m.emoji}</div>
+      <div class="my-item-body">
+        <div class="my-item-title">${m.title}</div>
+        <div class="my-item-price">${m.price.toLocaleString()}₮</div>
+      </div>
+      <div class="my-item-check">✓</div>
+    </div>
+  `).join('');
+  document.getElementById('productOverlay').classList.remove('show');
+  document.getElementById('swapOverlay').classList.add('show');
+}
+
+function selectMyItem(id) {
+  selectedMyItem = id;
+  document.querySelectorAll('.my-item').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('mi_'+id).classList.add('selected');
+}
+
+function closeSwap(e) {
+  if(!e || e.target===document.getElementById('swapOverlay'))
+    document.getElementById('swapOverlay').classList.remove('show');
+}
+
+function submitSwap() {
+  if(!selectedMyItem) { showToast('⚠️ Солилцох барааг сонгоно уу'); return; }
+  const mine = myItems.find(m=>m.id===selectedMyItem);
+  const extra = parseInt(document.getElementById('swapExtra').value)||0;
+  const note = document.getElementById('swapNote').value.trim();
+  const p = currentProduct;
+  swapRequests.unshift({
+    id: Date.now(), type:'outgoing', from: p.seller, fromInit: p.seller[0],
+    theirItem:{emoji:p.emoji,title:p.title,price:p.price},
+    myItem:{emoji:mine.emoji,title:mine.title,price:mine.price},
+    note: note + (extra>0 ? ` (+${extra.toLocaleString()}₮ нэмэлт)` : ''),
+    time:'Дөнгөж сая', status:'pending'
+  });
+  closeSwap();
+  updateNotif();
+  showToast('🔄 Солилцох хүсэлт амжилттай илгээгдлээ!');
+}
+
+function showRequests() {
+  const pending = swapRequests.filter(r=>r.type==='incoming'&&r.status==='pending').length;
+  document.getElementById('reqCount').textContent = pending > 0 ? pending+' шинэ' : '';
+  renderRequests();
+  document.getElementById('reqOverlay').classList.add('show');
+  document.getElementById('notifDot').style.display='none';
+}
+
+function closeRequests(e) {
+  if(!e || e.target===document.getElementById('reqOverlay'))
+    document.getElementById('reqOverlay').classList.remove('show');
+}
+
+function renderRequests() {
+  const list = document.getElementById('reqList');
+  if(swapRequests.length===0){list.innerHTML='<div style="text-align:center;color:var(--muted);padding:2rem">Хүсэлт байхгүй байна</div>';return;}
+  list.innerHTML = swapRequests.map(r=>`
+    <div class="req-card ${r.type==='incoming'?'incoming':r.status==='accepted'?'accepted':'outgoing'}" id="req_${r.id}">
+      <div class="req-top">
+        <div class="req-avatar ${r.type==='outgoing'?'out':''}">${r.fromInit}</div>
+        <div>
+          <div class="req-user">${r.type==='incoming'?r.from+' илгээсэн':'Та → '+r.from}</div>
+          <div class="req-time">${r.time}</div>
+        </div>
+        <span class="req-badge ${r.type==='incoming'&&r.status==='pending'?'in':r.status==='accepted'?'ok':'out'}">
+          ${r.type==='incoming'&&r.status==='pending'?'Ирсэн':r.status==='accepted'?'✅ Зөвшөөрсөн':'Илгээсэн'}
+        </span>
+      </div>
+      <div class="req-items">
+        <div class="req-item-box">
+          <span class="req-item-emoji">${r.type==='incoming'?r.theirItem.emoji:r.myItem.emoji}</span>
+          <div class="req-item-info">
+            <div class="req-item-name">${r.type==='incoming'?r.theirItem.title:r.myItem.title}</div>
+            <div class="req-item-val">${(r.type==='incoming'?r.theirItem.price:r.myItem.price).toLocaleString()}₮</div>
+          </div>
+        </div>
+        <span class="req-swap-icon">⇄</span>
+        <div class="req-item-box">
+          <span class="req-item-emoji">${r.type==='incoming'?r.myItem.emoji:r.theirItem.emoji}</span>
+          <div class="req-item-info">
+            <div class="req-item-name">${r.type==='incoming'?r.myItem.title:r.theirItem.title}</div>
+            <div class="req-item-val">${(r.type==='incoming'?r.myItem.price:r.theirItem.price).toLocaleString()}₮</div>
+          </div>
+        </div>
+      </div>
+      ${r.note?`<div class="req-note">"${r.note}"</div>`:''}
+      ${r.type==='incoming'&&r.status==='pending'?`
+        <div class="req-actions">
+          <button class="req-btn accept" onclick="acceptReq(${r.id})">✅ Зөвшөөрөх</button>
+          <button class="req-btn decline" onclick="declineReq(${r.id})">❌ Татгалзах</button>
+        </div>` :
+        r.type==='outgoing'&&r.status==='pending'?`
+        <div class="req-actions">
+          <button class="req-btn cancel" onclick="cancelReq(${r.id})">Цуцлах</button>
+        </div>`:''}
+    </div>
+  `).join('');
+}
+
+function acceptReq(id) {
+  const r = swapRequests.find(x=>x.id===id);
+  if(r) r.status='accepted';
+  renderRequests();
+  showToast('✅ Солилцоог зөвшөөрлөө! Чатаар холбоо барина уу');
+}
+
+function declineReq(id) {
+  swapRequests = swapRequests.filter(x=>x.id!==id);
+  renderRequests();
+  const pending = swapRequests.filter(r=>r.type==='incoming'&&r.status==='pending').length;
+  document.getElementById('reqCount').textContent = pending > 0 ? pending+' шинэ' : '';
+  showToast('Хүсэлтийг татгалзлаа');
+}
+
+function cancelReq(id) {
+  swapRequests = swapRequests.filter(x=>x.id!==id);
+  renderRequests();
+  showToast('Хүсэлт цуцлагдлаа');
+}
+
+function updateNotif() {
+  const pending = swapRequests.filter(r=>r.type==='incoming'&&r.status==='pending').length;
+  document.getElementById('notifDot').style.display = pending>0 ? 'block' : 'none';
+}
+
+function showAdmin() { updateAdminStats(); document.getElementById('adminOverlay').classList.add('show'); }
+function closeAdmin(e) {
+  if(!e || e.target===document.getElementById('adminOverlay'))
+    document.getElementById('adminOverlay').classList.remove('show');
+}
+
+function updateAdminStats() {
+  document.getElementById('adminEarnings').textContent = totalEarnings.toLocaleString() + '₮';
+  document.getElementById('adminSales').textContent = totalSales;
+}
+
+function updateCommPreview(val) {
+  const r = parseFloat(val)/100;
+  document.getElementById('commSliderVal').textContent = val + '%';
+  document.getElementById('currentCommRate').textContent = val + '%';
+  document.getElementById('previewComm1').textContent = Math.round(1000000*r).toLocaleString()+'₮';
+  document.getElementById('previewComm2').textContent = Math.round(2500000*r).toLocaleString()+'₮';
+  document.getElementById('previewComm3').textContent = Math.round(100000*r).toLocaleString()+'₮';
+}
+
+function saveCommRate() {
+  const val = parseFloat(document.getElementById('commSlider').value);
+  // COMMISSION_RATE-г шинэчлэх — жинхэнэ апп дотор энэ нь серверт хадгалагдана
+  window._commRate = val/100;
+  showToast(`✅ Шимтгэл ${val}% болж тохируулагдлаа`);
+}
+
+// ===== PHOTO SYSTEM =====
+let uploadedPhotos = []; // base64 array
+const MAX_PHOTOS = 6;
+
+function handleImgFile(input) {
+  const file = input.files[0];
+  if(!file) return;
+  if(uploadedPhotos.length >= MAX_PHOTOS) { showToast('⚠️ Хамгийн ихдээ 6 зураг оруулна'); return; }
+  readFile(file, src => { uploadedPhotos.push(src); renderPhotoGrid(); });
+  input.value = '';
+}
+
+function handleImgFiles(input) {
+  const files = Array.from(input.files);
+  const remaining = MAX_PHOTOS - uploadedPhotos.length;
+  if(remaining <= 0) { showToast('⚠️ Хамгийн ихдээ 6 зураг оруулна'); return; }
+  const toProcess = files.slice(0, remaining);
+  if(files.length > remaining) showToast(`⚠️ ${remaining} зураг л нэмэгдлээ`);
+  let done = 0;
+  toProcess.forEach(f => readFile(f, src => {
+    uploadedPhotos.push(src);
+    done++;
+    if(done === toProcess.length) renderPhotoGrid();
+  }));
+  input.value = '';
+}
+
+function readFile(file, cb) {
+  const reader = new FileReader();
+  reader.onload = e => cb(e.target.result);
+  reader.readAsDataURL(file);
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photoGrid');
+  const addRow = document.getElementById('addPhotoRow');
+  const hint = document.getElementById('photoHint');
+
+  grid.innerHTML = uploadedPhotos.map((src, i) => `
+    <div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:2px solid ${i===0?'var(--red)':'var(--border)'}">
+      <img src="${src}" style="width:100%;height:100%;object-fit:cover">
+      ${i===0?'<div style="position:absolute;top:4px;left:4px;background:var(--red);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px">НҮҮР</div>':''}
+      <button onclick="removePhoto(${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.55);border:none;color:white;border-radius:50%;width:22px;height:22px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">✕</button>
+    </div>
+  `).join('');
+
+  // Add "+" tile if under limit
+  if(uploadedPhotos.length < MAX_PHOTOS && uploadedPhotos.length > 0) {
+    grid.innerHTML += `
+      <div onclick="document.getElementById('galleryInput').click()"
+        style="aspect-ratio:1;border-radius:10px;border:1.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--bg);gap:4px">
+        <span style="font-size:24px">＋</span>
+        <span style="font-size:10px;color:var(--muted)">${MAX_PHOTOS - uploadedPhotos.length} үлдсэн</span>
+      </div>`;
+  }
+
+  addRow.style.display = uploadedPhotos.length > 0 ? 'none' : 'grid';
+  hint.textContent = uploadedPhotos.length > 0
+    ? `${uploadedPhotos.length} зураг нэмэгдлээ · Эхний зураг нүүр зураг`
+    : 'Эхний зураг нүүр зураг болно';
+}
+
+function removePhoto(i) {
+  uploadedPhotos.splice(i, 1);
+  renderPhotoGrid();
+}
+
+// ===== IMAGE SYSTEM =====
+let uploadedPhotos = []; // base64 array for current listing
+let currentImgIdx = 0;   // slideshow index in product modal
+let viewerIdx = 0;       // fullscreen viewer index
+
+const MAX_PHOTOS = 6;
+
+function handleImgFile(input) {
+  // Single camera shot
+  const file = input.files[0];
+  if(!file) return;
+  readAndAdd([file]);
+  input.value = '';
+}
+
+function handleImgFiles(input) {
+  // Multiple from gallery
+  const files = Array.from(input.files);
+  readAndAdd(files);
+  input.value = '';
+}
+
+function readAndAdd(files) {
+  const remaining = MAX_PHOTOS - uploadedPhotos.length;
+  const toRead = files.slice(0, remaining);
+  if(toRead.length === 0) { showToast('⚠️ Хамгийн ихдээ 6 зураг оруулна уу'); return; }
+
+  let loaded = 0;
+  toRead.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      // Resize before storing to keep memory reasonable
+      resizeImage(e.target.result, 1200, base64 => {
+        uploadedPhotos.push(base64);
+        loaded++;
+        if(loaded === toRead.length) renderPhotoGrid();
+      });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function resizeImage(src, maxW, cb) {
+  const img = new Image();
+  img.onload = () => {
+    const ratio = Math.min(1, maxW / img.width);
+    const canvas = document.createElement('canvas');
+    canvas.width  = Math.round(img.width  * ratio);
+    canvas.height = Math.round(img.height * ratio);
+    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+    cb(canvas.toDataURL('image/jpeg', 0.82));
+  };
+  img.src = src;
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photoGrid');
+  const addRow = document.getElementById('addPhotoRow');
+  const hint = document.getElementById('photoHint');
+
+  grid.innerHTML = uploadedPhotos.map((src, i) => `
+    <div style="position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;border:2px solid ${i===0?'var(--red)':'var(--border)'}">
+      <img src="${src}" style="width:100%;height:100%;object-fit:cover">
+      ${i===0?'<div style="position:absolute;bottom:4px;left:4px;background:var(--red);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px">НҮҮР</div>':''}
+      <button onclick="removePhoto(${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:white;border:none;border-radius:50%;width:22px;height:22px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+  `).join('');
+
+  // Hide add buttons if max reached
+  addRow.style.display = uploadedPhotos.length >= MAX_PHOTOS ? 'none' : 'grid';
+  hint.textContent = uploadedPhotos.length > 0
+    ? `${uploadedPhotos.length}/6 зураг · Эхний зураг нүүр зураг болно`
+    : 'Эхний зураг нүүр зураг болно';
+}
+
+function removePhoto(idx) {
+  uploadedPhotos.splice(idx, 1);
+  renderPhotoGrid();
+}
+
+// ---- Slideshow in product modal ----
+function setModalImages(photos) {
+  // photos = array of base64 OR null (use emoji fallback)
+  currentImgIdx = 0;
+  renderModalSlide(photos);
+}
+
+function renderModalSlide(photos) {
+  const box = document.getElementById('modalImg');
+  const dots = document.getElementById('modalDots');
+  const prev = document.getElementById('imgPrev');
+  const next = document.getElementById('imgNext');
+
+  if(!photos || photos.length === 0) {
+    // Emoji fallback already set before calling this
+    dots.innerHTML = '';
+    prev.style.display = 'none';
+    next.style.display = 'none';
+    return;
+  }
+
+  box.innerHTML = `<img src="${photos[currentImgIdx]}" style="width:100%;height:100%;object-fit:cover">`;
+  box.dataset.photos = JSON.stringify(photos);
+
+  dots.innerHTML = photos.map((_, i) => `
+    <div onclick="jumpSlide(${i})" style="width:${i===currentImgIdx?'18':'7'}px;height:7px;border-radius:4px;background:${i===currentImgIdx?'var(--red)':'var(--border)'};cursor:pointer;transition:all 0.2s"></div>
+  `).join('');
+
+  prev.style.display = photos.length > 1 ? 'flex' : 'none';
+  next.style.display = photos.length > 1 ? 'flex' : 'none';
+}
+
+function slideImg(dir) {
+  const box = document.getElementById('modalImg');
+  const photos = JSON.parse(box.dataset.photos || '[]');
+  if(!photos.length) return;
+  currentImgIdx = (currentImgIdx + dir + photos.length) % photos.length;
+  renderModalSlide(photos);
+}
+
+function jumpSlide(i) {
+  const box = document.getElementById('modalImg');
+  const photos = JSON.parse(box.dataset.photos || '[]');
+  currentImgIdx = i;
+  renderModalSlide(photos);
+}
+
+// ---- Fullscreen viewer ----
+function openImgViewer() {
+  const box = document.getElementById('modalImg');
+  const photos = JSON.parse(box.dataset.photos || '[]');
+  if(!photos.length) return;
+  viewerIdx = currentImgIdx;
+  renderViewer(photos);
+  document.getElementById('imgViewerOverlay').style.display = 'flex';
+}
+
+function closeImgViewer() {
+  document.getElementById('imgViewerOverlay').style.display = 'none';
+}
+
+function renderViewer(photos) {
+  document.getElementById('imgViewerImg').src = photos[viewerIdx];
+  document.getElementById('imgViewerCount').textContent = `${viewerIdx+1} / ${photos.length}`;
+  document.getElementById('imgViewerDots').innerHTML = photos.map((_,i)=>
+    `<div style="width:${i===viewerIdx?'18':'7'}px;height:7px;border-radius:4px;background:${i===viewerIdx?'white':'rgba(255,255,255,0.35)'};transition:all 0.2s"></div>`
+  ).join('');
+  document.getElementById('imgViewerOverlay').dataset.photos = JSON.stringify(photos);
+}
+
+function viewerSlide(dir) {
+  const photos = JSON.parse(document.getElementById('imgViewerOverlay').dataset.photos || '[]');
+  viewerIdx = (viewerIdx + dir + photos.length) % photos.length;
+  renderViewer(photos);
+}
+
+// Swipe support for viewer
+let touchStartX = 0;
+document.getElementById('imgViewerOverlay').addEventListener('touchstart', e => touchStartX = e.touches[0].clientX);
+document.getElementById('imgViewerOverlay').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if(Math.abs(dx) > 40) viewerSlide(dx < 0 ? 1 : -1);
+});
+
+render(products);
+updateNotif();
+updateNotifBadge();
+
+// Жишээ болгож 8 секундын дараа шинэ зар орж ирсэн дуурайлга
+setTimeout(()=>{
+  const demo = { id:'ndemo', emoji:'🚲', title:'Giant Mountain Bike 2024 — Шинэ!', seller:'Мөнхбаяр С.', price:1200000, loc:'Хан-Уул', cat:'Спорт', time:'Дөнгөж сая', read:false, productId:6 };
+  pushNotification(demo);
+}, 8000);
+</script>
+</body>
+</html>
